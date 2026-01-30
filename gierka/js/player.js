@@ -91,12 +91,8 @@ export default class Player {
 
         ctx.restore();
 
-        //ctx.fillStyle = '#000000';
-        //ctx.beginPath();
-        //ctx.arc( this.pos.x, this.pos.y, this.r, 0, Math.PI * 2 );
-        //ctx.closePath();
-        //ctx.fill();
 
     }
+
 
 }
