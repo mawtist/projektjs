@@ -64,11 +64,6 @@ export default class bullet {
         
         ctx.restore();
 
-        //const ctx = window.CANVAS.ctx;
-        //ctx.fillStyle = `#A9A9A9`;    
-        //ctx.beginPath();
-        //ctx.arc( this.pos.x, this.pos.y, this.r, 0, Math.PI *2);
-        //ctx.closePath();
-        //ctx.fill();
     }
+
 }
