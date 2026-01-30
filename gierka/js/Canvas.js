@@ -49,9 +49,8 @@ export default class Canvas {
             this.ctx.fillRect( 0, 0, this.width, this.height);
         }
 
-        //this.ctx.fillStyle = '#d2d2d2';
-        //this.ctx.fillRect( 0, 0, this.width, this.height );
 
     }
 
 }
+
