@@ -2,19 +2,19 @@ export default class Events {
     
     mapKeys = {
         LEFT : {
-            code : 65,
+            code : "KeyA",
             down: false
         },
         UP : {
-            code : 87,
+            code : "KeyW",
             down: false
         },
         RIGHT : {
-            code : 68,
+            code : "KeyD",
             down: false
         },
         DOWN : {
-            code : 83,
+            code : "KeyS",
             down: false
         }
     }
@@ -28,7 +28,7 @@ export default class Events {
     constructor() {
 
         window.addEventListener( `keydown`, event => {
-            switch( event.keyCode ) {
+            switch( event.code ) {
                 case this.mapKeys.LEFT.code:
                 this.mapKeys.LEFT.down = true;
                     break;
@@ -44,7 +44,7 @@ export default class Events {
             }
         });
         window.addEventListener( `keyup`, event => {
-            switch( event.keyCode ) {
+            switch( event.code ) {
                 case this.mapKeys.LEFT.code:
                     this.mapKeys.LEFT.down = false;
                     break;

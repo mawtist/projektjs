@@ -1,6 +1,6 @@
 export default class bullet { 
 
-    constructor( sx, sy, dx, dy ) {
+    constructor( sx, sy, dx, dy, strzelak = null ) {
 
         this.pos = {
             x : sx, 
@@ -8,12 +8,19 @@ export default class bullet {
         };
         this.dir = { x : 0, y : 0 }
         this.r = 5;
-        this.speed = 200;
+        this.speed = 500; 
         this.alive = true;
+        this.strzelak = strzelak;
+        this.shooter = strzelak;
+        this.killedByMap = false;
 
-        const bulletImg = new Image();
-        bulletImg.src = './img/Tank/Bullet.png';
-        this.imgbullet = bulletImg;
+
+        if (!bullet.sharedImg) {
+            const img = new Image();
+            img.src = './img/Tank/Bullet.png';
+            bullet.sharedImg = img;
+        }
+        this.imgbullet = bullet.sharedImg;
 
         this.calc(dx, dy);
     }
@@ -23,30 +30,31 @@ export default class bullet {
         let x = dx - this.pos.x;
         let y = dy - this.pos.y;
 
-        //console.log(x, y);
+
         if( x!= 0 || y != 0 ) {
             const a = Math.atan2( y, x );
-            //console.log( a );
+
             this.dir.x = Math.cos( a );
             this.dir.y = Math.sin( a );
         }
     }
 
     update() {
-
-
         const speed = this.speed * (window.DELAY / 1000);
 
         this.pos.x += this.dir.x * speed;
         this.pos.y += this.dir.y * speed;
         
-         if (
-        this.pos.x + this.r < 0 ||
-        this.pos.x - this.r > window.CANVAS.width ||
-        this.pos.y + this.r < 0 ||
-        this.pos.y - this.r > window.CANVAS.height
-        ) {
-            this.alive = false;
+
+        if(window.GAME && window.GAME.map && window.GAME.map.checkCollision(this.pos, this.r)) {
+            this.killedByMap = true;
+        }
+
+        if (this.pos.x + this.r < 0 ||
+            this.pos.x - this.r > window.CANVAS.width ||
+            this.pos.y + this.r < 0 ||
+            this.pos.y - this.r > window.CANVAS.height) {
+            this.killedByMap = true;
         }
     }
 

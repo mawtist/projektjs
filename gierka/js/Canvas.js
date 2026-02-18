@@ -23,10 +23,18 @@ export default class Canvas {
         body.style.height = '100vh';
         body.style.overflow = 'hidden';
 
-        this.element.style.cursor = 'none'; 
+        this.element.style.cursor = 'auto';
 
         window.addEventListener( 'resize', () => this.resize() );
 
+    }
+
+    hideCursor() {
+        this.element.style.cursor = 'none';
+    }
+
+    showCursor() {
+        this.element.style.cursor = 'auto';
     }
 
     resize() {

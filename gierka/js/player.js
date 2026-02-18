@@ -1,29 +1,64 @@
 export default class Player {
 
     constructor() {
-        this.pos = {
-            x : Math.floor(Math.random() * window.innerWidth),
-            y : Math.floor(Math.random() * window.innerHeight)
-        };
+        this.r = 10;
+        this.speed = 100;  
+        
+        this.ostatnistrzal = 0;
+        this.strzelcooldown = 1000;
+
+        this.bodyAngle = 0;
+        this.turretAngle = 0;
+        
+        this.hp = 3;
+        this.invulnerabilityTimer = 0;
+        this.invulnerabilityDuration = 1000;
+        
         this.dir = {
             x : 0,
             y : 0
         };
-        this.r = 10;
-        this.speed = 100;  
-        
-        this.bodyAngle = 0;
-        this.turretAngle = 0; 
     
         this.imgBody = new Image();
         this.imgBody.src = './img/Tank/Tank.png';
         this.imgTurret = new Image();
         this.imgTurret.src = './img/Tank/GunTurret.png';
-
+        if(window.GAME && window.GAME.map) {
+            this.pos = window.GAME.map.findSafeSpawnPoint(this.r);
+        } else {
+            this.pos = {
+                x : Math.floor(Math.random() * window.innerWidth),
+                y : Math.floor(Math.random() * window.innerHeight)
+            };
+        }
     }
 
+    takeDamage() {
+        if(this.invulnerabilityTimer <= 0) {
+            this.hp--;
+            this.invulnerabilityTimer = this.invulnerabilityDuration;
+            
+            if(this.hp <= 0) {
+                window.GAME.saveScore();
+                window.GAME.gameOver = true;
+            }
+        }
+    }
+
+    canshoot() {
+        const teraz = new Date().getTime();
+        if ( teraz - this.ostatnistrzal >= this.strzelcooldown ) {
+            this.ostatnistrzal = teraz;
+            return true;
+        }
+        return false;
+    }
 
     update() {
+        if(this.invulnerabilityTimer > 0) {
+            this.invulnerabilityTimer -= window.DELAY;
+        }
+
         const keys = window.EVENTS.mapKeys;
 
         if( keys.LEFT.down ) this.dir.x = -1 ; 
@@ -34,16 +69,12 @@ export default class Player {
         else if( keys.DOWN.down ) this.dir.y = 1; 
         else this.dir.y = 0;
 
-        //console.log(this.dir);
-
         const speed = this.speed * (window.DELAY / 1000);
-
         let x = this.dir.x; 
         let y = this.dir.y; 
 
         if( x != 0 || y != 0 ) {
             const a = Math.atan2( this.dir.y, this.dir.x );
-            //console.log( a );
             x = Math.cos( a );
             y = Math.sin( a );
             this.bodyAngle = Math.atan2(y, x );
@@ -51,6 +82,10 @@ export default class Player {
 
         this.pos.x += x * speed;
         this.pos.y += y * speed;
+        if(window.GAME.map.checkCollision(this.pos, this.r)) {
+            this.pos.x -= x * speed;
+            this.pos.y -= y * speed;
+        }
 
         if ( this.pos.x - this.r < 0 ) this.pos.x = this.r;
         else if( this.pos.x + this.r > window.CANVAS.width) this.pos.x = window.CANVAS.width - this.r;
