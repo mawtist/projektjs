@@ -1,7 +1,7 @@
 export default class Player {
 
     constructor() {
-        this.r = 10;
+        this.r = 35;
         this.speed = 100;  
         
         this.ostatnistrzal = 0;

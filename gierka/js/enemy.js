@@ -10,7 +10,7 @@ export default class Enemy {
             x : 0,
             y : 0
         };
-        this.r = 20;
+        this.r = 35;
         this.speed = 80;
 
 
