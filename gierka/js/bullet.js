@@ -1,6 +1,6 @@
 export default class bullet { 
 
-    constructor( sx, sy, dx, dy, strzelak = null ) {
+    constructor( sx, sy, dx, dy, shooter = null ) {
 
         this.pos = {
             x : sx, 
@@ -10,8 +10,7 @@ export default class bullet {
         this.r = 5;
         this.speed = 500; 
         this.alive = true;
-        this.strzelak = strzelak;
-        this.shooter = strzelak;
+        this.shooter = shooter;
         this.killedByMap = false;
 
 
@@ -65,7 +64,7 @@ export default class bullet {
 
         ctx.translate( this.pos.x, this.pos.y );
 
-        const angle = Math.atan2( this.dir.y, this.dir.x );
+        const angle = Math.atan2( this.dir.y, this.dir.x ) + Math.PI/2;
         ctx.rotate( angle );
 
         ctx.drawImage( this.imgbullet, -this.r, -this.r, this.r *2, this.r *2 );

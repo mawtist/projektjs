@@ -65,9 +65,7 @@ export default class Events {
         window.addEventListener(`mouseout`, event => this.mapMouse.over = false );
 
         window.addEventListener(`mousemove`, event => {
-            
             const bound = window.CANVAS.element.getBoundingClientRect();
-            //console.log( bound );
             this.mapMouse.x = event.clientX - bound.x;
             this.mapMouse.y = event.clientY - bound.y;
         } );

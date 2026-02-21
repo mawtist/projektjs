@@ -1,7 +1,7 @@
 import Player from "./player.js";
 import viewfinder from "./viewfinder.js";
 import bullet from "./bullet.js";
-import Enemy1 from "./enemy.js";
+import Enemy from "./enemy.js";
 import Map from "./map.js";
 
 export default class Game {
@@ -14,7 +14,7 @@ export default class Game {
         this.map = new Map;  
         this.viewfinder = new viewfinder;
         this.Player = new Player;  
-        this.Enemy1 = new Enemy1;
+        this.enemy = new Enemy();
         this.bullets = [];
 
         this.lastTime = new Date().getTime();
@@ -32,6 +32,9 @@ export default class Game {
         this.maxBullets = 50; 
         
 
+        this.heartImg = new Image();
+        this.heartImg.src = './img/heart.png';
+
     }
 
     loadScores() {
@@ -47,7 +50,6 @@ export default class Game {
     }
 
     loop(){
-e.
         this.tick();
         requestAnimationFrame(() => this.loop());
     }
@@ -71,11 +73,11 @@ e.
         if(this.gameOver) return; 
 
 
-        if(!this.Enemy1.alive) {
+        if(!this.enemy.alive) {
             this.enemyRespawnTimer += window.DELAY;
             if(this.enemyRespawnTimer >= this.enemyRespawnDelay) {
                 this.addScore(100); 
-                this.Enemy1 = new Enemy1;
+                this.enemy = new Enemy();
                 this.enemyRespawnTimer = 0;
             }
         }
@@ -94,13 +96,12 @@ e.
             }
         }
         this.Player.update();
-        if(this.Enemy1.alive) {
-            this.Enemy1.update();
+        if(this.enemy.alive) {
+            this.enemy.update();
         }
         
 
-        if(this.bullets.length) {
-            this.bullets.forEach( bullet => {
+        this.bullets.forEach( bullet => {
                 bullet.update();
                 
  
@@ -116,18 +117,17 @@ e.
                 }
                 
 
-                if(bullet.alive && bullet.shooter === 'player' && this.Enemy1.alive) {
-                    const dx = bullet.pos.x - this.Enemy1.pos.x;
-                    const dy = bullet.pos.y - this.Enemy1.pos.y;
+                if(bullet.alive && bullet.shooter === 'player' && this.enemy.alive) {
+                    const dx = bullet.pos.x - this.enemy.pos.x;
+                    const dy = bullet.pos.y - this.enemy.pos.y;
                     const distance = Math.sqrt(dx * dx + dy * dy);
                     
-                    if(distance < bullet.r + this.Enemy1.r) {
-                        this.Enemy1.takeDamage();
+                    if(distance < bullet.r + this.enemy.r) {
+                        this.enemy.takeDamage();
                         bullet.alive = false;
                     }
                 }
             });
-        }
         this.bullets = this.bullets.filter(b => b.alive && !b.killedByMap);
     }
 
@@ -135,13 +135,11 @@ e.
         window.CANVAS.clean();
         this.map.render();
         this.Player.render();
-        if(this.Enemy1.alive) {
-            this.Enemy1.render();
+        if(this.enemy.alive) {
+            this.enemy.render();
         }
         this.viewfinder.render();
-        if(this.bullets.length) {
-            this.bullets.forEach( bullet => bullet.render() );
-        }
+        this.bullets.forEach( bullet => bullet.render() );
         
         
         this.renderUI();
@@ -151,11 +149,18 @@ e.
         const ctx = window.CANVAS.ctx;
         
        
-        ctx.fillStyle = '#00FF00';
-        ctx.font = '20px Arial';
-        ctx.textAlign = 'left';
-        ctx.fillText(`HP: ${this.Player.hp}`, 20, 30);
-        
+
+        const heartSize = 32;
+        const heartPadding = 8;
+        for (let i = 0; i < this.Player.hp; i++) {
+            ctx.drawImage(
+                this.heartImg,
+                20 + i * (heartSize + heartPadding),
+                10,
+                heartSize,
+                heartSize
+            );
+        }
         
         const scoreBoxX = window.CANVAS.width - 220;
         const scoreBoxY = 10;
@@ -180,7 +185,7 @@ e.
         ctx.fillText(this.score, window.CANVAS.width - 115, 60);
         
  
-        if(!this.Enemy1.alive) {
+        if(!this.enemy.alive) {
             const respawnSeconds = Math.ceil((this.enemyRespawnDelay - this.enemyRespawnTimer) / 1000);
             ctx.fillStyle = '#FFFF00';
             ctx.font = '16px Arial';

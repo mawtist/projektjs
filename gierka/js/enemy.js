@@ -2,14 +2,6 @@ import bullet from './bullet.js';
 
 export default class Enemy {
     constructor() {
-        this.pos = {
-            x : Math.floor(Math.random() * window.innerWidth),
-            y : Math.floor(Math.random() * window.innerHeight)
-        };
-        this.dir = {
-            x : 0,
-            y : 0
-        };
         this.r = 35;
         this.speed = 80;
 
@@ -33,12 +25,8 @@ export default class Enemy {
         
         this.bodyAngle = 0;
         this.turretAngle = 0;
-        
-        this.dir = {
-            x : 0,
-            y : 0
-        };
 
+        this.dir = { x: 0, y: 0 };
         
         if(window.GAME && window.GAME.map) {
             this.pos = window.GAME.map.findSafeSpawnPoint(this.r);

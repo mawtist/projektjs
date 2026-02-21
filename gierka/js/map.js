@@ -57,22 +57,6 @@ export default class Map {
         return { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     }
 
-    getCollidingObstacle(pos, radius) {
-        for (let i = 0; i < this.obstacles.length; i++) {
-            let obstacle = this.obstacles[i];
-            let closestX = Math.max(obstacle.x, Math.min(pos.x, obstacle.x + obstacle.width));
-            let closestY = Math.max(obstacle.y, Math.min(pos.y, obstacle.y + obstacle.height));
-
-            let distanceX = pos.x - closestX;
-            let distanceY = pos.y - closestY;
-            let distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
-
-            if (distance < radius) {
-                return obstacle;
-            }
-        }
-        return null;
-    }
 
     render() {
         let ctx = window.CANVAS.ctx;
