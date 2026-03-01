@@ -3,6 +3,7 @@ import viewfinder from "./viewfinder.js";
 import bullet from "./bullet.js";
 import Enemy from "./enemy.js";
 import Map from "./map.js";
+import Map2 from "./map2.js";
 
 export default class Game {
 
@@ -11,7 +12,11 @@ export default class Game {
        
         window.GAME = this;
         
-        this.map = new Map;  
+        this.map = new Map();
+        this.currentMapIndex = 1;
+        this.nextHpRegen = 500;
+        this.nextMapSwitch = 1000;
+        this.maxHp = 5;
         this.viewfinder = new viewfinder;
         this.Player = new Player;  
         this.enemy = new Enemy();
@@ -73,6 +78,25 @@ export default class Game {
 
     addScore(points) {
         this.score += points;
+
+        while (this.score >= this.nextHpRegen) {
+            if (this.Player && this.Player.hp < this.maxHp) {
+                this.Player.hp = Math.min(this.Player.hp + 1, this.maxHp);
+            }
+            this.nextHpRegen += 500;
+        }
+
+        while (this.score >= this.nextMapSwitch) {
+            if (this.currentMapIndex === 1) {
+                this.map = new Map2();
+                this.currentMapIndex = 2;
+            } else {
+                this.map = new Map();
+                this.currentMapIndex = 1;
+            }
+            if (this.Player) this.Player.hp = 3;
+            this.nextMapSwitch += 500;
+        }
     }
 
     update(){
