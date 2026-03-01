@@ -36,8 +36,17 @@ export default class Menu {
         window.GAME = new Game();
     }
 
+
+
     render() {
+
         if(!this.active) return;
+        if (this.isMouseOver()) {
+            window.CANVAS.element.style.cursor = 'pointer';
+        } else {
+            window.CANVAS.element.style.cursor = 'auto';
+        }
+
         const ctx = window.CANVAS.ctx;
         ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
         ctx.fillRect(0, 0, window.CANVAS.width, window.CANVAS.height);
@@ -60,8 +69,11 @@ export default class Menu {
         ctx.fillText('Czerwony celownik = nie możesz strzelić', window.CANVAS.width / 2, 390);
 
         const rect = this.startButtonRect;
+        this.startButtonRect.y = window.CANVAS.height / 2 + 50;
+        this.startButtonRect.x = window.CANVAS.width / 2 - rect.width / 2;
         ctx.fillStyle = '#00FF00';
         ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+
 
         ctx.fillStyle = '#000000';
         ctx.font = 'bold 32px Arial';
@@ -73,6 +85,8 @@ export default class Menu {
         ctx.textAlign = 'center';
         ctx.fillText('dostaniesz 3 razy to umierasz, 3 sekundy po zestrzeleniu przeciwnika zjawia się kolejny', window.CANVAS.width / 2, window.CANVAS.height - 100);
         this.renderScoresTable(ctx);
+
+        
     }
 
     renderScoresTable(ctx) {
@@ -108,5 +122,13 @@ export default class Menu {
                 ctx.fillText('-', tableX + tableWidth / 2, yPos);
             }
         }
+    }
+    isMouseOver(){
+        const mouse = window.EVENTS.mapMouse;
+        const rect = this.startButtonRect;
+        return mouse.x >= rect.x &&
+        mouse.x <= rect.x + rect.width &&
+        mouse.y >= rect.y &&
+        mouse.y <= rect.y + rect.height;
     }
 }

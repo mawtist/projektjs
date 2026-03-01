@@ -17,6 +17,13 @@ export default class Game {
         this.enemy = new Enemy();
         this.bullets = [];
 
+        this.restartButtonRect = {
+            x: window.CANVAS ? window.CANVAS.width / 2 - 100 : window.innerWidth / 2 - 100,
+            y: window.CANVAS ? window.CANVAS.height / 2 + 100 : window.innerHeight / 2 + 100,
+            width: 200,
+            height: 60
+        };
+
         this.lastTime = new Date().getTime();
         
 
@@ -70,7 +77,17 @@ export default class Game {
 
     update(){
 
-        if(this.gameOver) return; 
+if(this.gameOver) {
+            this.restartButtonRect.x = window.CANVAS.width / 2 - this.restartButtonRect.width / 2;
+            this.restartButtonRect.y = window.CANVAS.height / 2 + 100;
+
+            if (window.EVENTS.mapMouse.down && this.isMouseOverRestart()) {
+                window.CANVAS.showCursor();
+                window.GAME = new Game();
+                return; 
+            }
+            return;
+        }
 
 
         if(!this.enemy.alive) {
@@ -132,6 +149,10 @@ export default class Game {
     }
 
     render() {
+        if (!this.gameOver) {
+            window.CANVAS.hideCursor();
+        }
+
         window.CANVAS.clean();
         this.map.render();
         this.Player.render();
@@ -195,6 +216,8 @@ export default class Game {
         
  
         if(this.gameOver) {
+            window.CANVAS.showCursor();
+
             ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
             ctx.fillRect(0, 0, window.CANVAS.width, window.CANVAS.height);
             
@@ -206,11 +229,33 @@ export default class Game {
             ctx.fillStyle = '#FFFF00';
             ctx.font = 'bold 32px Arial';
             ctx.fillText(`WYNIK: ${this.score}`, window.CANVAS.width / 2, window.CANVAS.height / 2 + 20);
-            
+
+            const rect = this.restartButtonRect;
+            ctx.fillStyle = '#FF0000';
+            ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+            ctx.fillStyle = '#000000';
+            ctx.font = 'bold 32px Arial';
+            ctx.fillText('RESTART', window.CANVAS.width / 2, rect.y + 40);
+
             ctx.fillStyle = '#FFFFFF';
             ctx.font = '24px Arial';
-            ctx.fillText('przeładuj stronę jak chcesz zagrać znowu', window.CANVAS.width / 2, window.CANVAS.height / 2 + 80);
+            ctx.fillText('naciśnij przycisk aby zagrać ponownie', window.CANVAS.width / 2, window.CANVAS.height / 2 + 80);
+
+            if (this.isMouseOverRestart()) {
+                window.CANVAS.element.style.cursor = 'pointer';
+            } else {
+                window.CANVAS.element.style.cursor = 'auto';
+            }
         }
+    }
+
+    isMouseOverRestart() {
+        const mouse = window.EVENTS.mapMouse;
+        const rect = this.restartButtonRect;
+        return mouse.x >= rect.x &&
+               mouse.x <= rect.x + rect.width &&
+               mouse.y >= rect.y &&
+               mouse.y <= rect.y + rect.height;
     }
 
 }

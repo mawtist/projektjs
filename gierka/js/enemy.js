@@ -13,6 +13,10 @@ export default class Enemy {
         this.directionChangeTimer = 0;
         this.directionChangeInterval = 2000; 
 
+
+        this.targetDir = { x: 0, y: 0 };
+        this.turnSmoothing = 0.2; 
+
        
         this.lastShotTime = 0;
         this.shootCooldown = 1500; 
@@ -39,6 +43,8 @@ export default class Enemy {
         
 
         this.changeDirection();
+        this.dir.x = this.targetDir.x;
+        this.dir.y = this.targetDir.y;
     }
 
     takeDamage() {
@@ -53,10 +59,9 @@ export default class Enemy {
     changeDirection() {
    
         const angle = Math.random() * Math.PI * 2;
-        this.dir.x = Math.cos(angle);
-        this.dir.y = Math.sin(angle);
+        this.targetDir.x = Math.cos(angle);
+        this.targetDir.y = Math.sin(angle);
         this.directionChangeTimer = 0;
-
     }
 
     canShoot() {
@@ -72,19 +77,26 @@ export default class Enemy {
         
         this.directionChangeTimer += window.DELAY;
         
-        
         if(this.directionChangeTimer >= this.directionChangeInterval) {
             this.changeDirection();
         }
         
+        this.dir.x = this.targetDir.x;
+        this.dir.y = this.targetDir.y;
+
         const speed = this.speed * (window.DELAY / 1000);
         
         let x = this.dir.x;
         let y = this.dir.y;
         
-        
         if(x != 0 || y != 0) {
-            this.bodyAngle = Math.atan2(y, x);
+
+            const desired = Math.atan2(y, x);
+            let delta = desired - this.bodyAngle;
+
+            if(delta > Math.PI) delta -= 2 * Math.PI;
+            else if(delta < -Math.PI) delta += 2 * Math.PI;
+            this.bodyAngle += delta * this.turnSmoothing;
         }
         
         this.pos.x += x * speed;
@@ -94,32 +106,43 @@ export default class Enemy {
         if(window.GAME && window.GAME.map && window.GAME.map.checkCollision(this.pos, this.r)) {
             this.pos.x -= x * speed;
             this.pos.y -= y * speed;
-            this.changeDirection(); 
+
+            this.changeDirection();
+            this.dir.x = this.targetDir.x;
+            this.dir.y = this.targetDir.y;
         }
         
         
         if ( this.pos.x - this.r < 0 ) {
             this.pos.x = this.r;
-            this.dir.x *= -1;
+
+            this.targetDir.x = Math.abs(this.targetDir.x) || 0.1;
+            this.dir.x = this.targetDir.x;
         }
         else if( this.pos.x + this.r > window.CANVAS.width) {
             this.pos.x = window.CANVAS.width - this.r;
-            this.dir.x *= -1;
+
+            this.targetDir.x = -Math.abs(this.targetDir.x) || -0.1;
+            this.dir.x = this.targetDir.x;
         }
 
         if ( this.pos.y - this.r < 0 ) {
             this.pos.y = this.r;
-            this.dir.y *= -1;
+
+            this.targetDir.y = Math.abs(this.targetDir.y) || 0.1;
+            this.dir.y = this.targetDir.y;
         }
         else if( this.pos.y + this.r > window.CANVAS.height) {
             this.pos.y = window.CANVAS.height - this.r;
-            this.dir.y *= -1;
+
+            this.targetDir.y = -Math.abs(this.targetDir.y) || -0.1;
+            this.dir.y = this.targetDir.y;
         }
         
        
-        const dx = window.GAME.Player.pos.x - this.pos.x;
-        const dy = window.GAME.Player.pos.y - this.pos.y;
-        this.turretAngle = Math.atan2(dy, dx);
+        const aimX = window.GAME.Player.pos.x - this.pos.x;
+        const aimY = window.GAME.Player.pos.y - this.pos.y;
+        this.turretAngle = Math.atan2(aimY, aimX);
 
        
         if(this.canShoot()) {
